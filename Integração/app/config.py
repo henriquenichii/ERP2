@@ -1,11 +1,14 @@
+# Arquivo: app/config.py
 import os
 
 class Config:
+    """
+    Classe de configuração da aplicação Flask.
+    Lê as configurações a partir das variáveis de ambiente.
+    """
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'uma_chave_secreta_padrao_para_desenvolvimento'
-    # Configurações do Banco de Dados (exemplo para SQLite, você usará seu DB relacional)
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Outras configurações globais podem vir aqui, ex:
-    # WHATSAPP_API_KEY = os.environ.get('WHATSAPP_API_KEY')
-    # PDF_EXTRACTION_MODEL = 'v1'
+    # A URI do banco de dados será lida diretamente da variável de ambiente
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

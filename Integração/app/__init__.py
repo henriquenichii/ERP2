@@ -1,75 +1,56 @@
+# Arquivo: app/__init__.py
 import os
-import json
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
-# Importe o Blueprint de páginas, mas ele deve estar fora da função
-# para ser usado em outras partes do código
-from app.main_pages.routes import main_pages_bp
+# Carrega as variáveis de ambiente do arquivo .env ANTES de tudo.
+# Isso garante que a Config encontre a DATABASE_URL.
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+load_dotenv(os.path.join(basedir, '.env'))
 
-# from flask_sqlalchemy import SQLAlchemy
-# db = SQLAlchemy()
-
-# --- Funções Auxiliares para Persistência de Dados (JSON) ---
-DATA_FILE = 'data.json'
-
-def load_data():
-    """Carrega os dados de usuários e pedidos do arquivo JSON."""
-    if not os.path.exists(DATA_FILE):
-        initial_data = {'users': {}, 'pedidos': []}
-        with open(DATA_FILE, 'w', encoding='utf-8') as f:
-            json.dump(initial_data, f, indent=4, ensure_ascii=False)
-        return initial_data
-    with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-def save_data(data):
-    """Salva os dados de usuários e pedidos no arquivo JSON."""
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-
-# Garante que o arquivo de dados exista ao iniciar o módulo
-load_data()
-
+db = SQLAlchemy()
 
 def create_app():
+    """
+    Função Application Factory: configura e retorna a instância da aplicação Flask.
+    """
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
 
-    # Carregar configurações
+    # Carrega as configurações do nosso objeto Config
     app.config.from_object('app.config.Config')
-    try:
-        app.config.from_pyfile('config.py', silent=True)
-    except FileNotFoundError:
-        pass
 
-    # Cria a pasta de upload
+    # --- DEBUG: Imprime a URI do banco para confirmar que está correta ---
+    print("*" * 80)
+    print(f"INFO: Conectando ao banco de dados: {app.config['SQLALCHEMY_DATABASE_URI']}")
+    print("*" * 80)
+    
+    db.init_app(app)
+
+    # ... (o resto do seu código de criação de pasta e registro de blueprints continua igual) ...
     UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads_temp')
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-    # UPLOAD_FOLDER = 'uploads_temp'
-    # if not os.path.exists(UPLOAD_FOLDER):
-    #     os.makedirs(UPLOAD_FOLDER)
-    # app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    from .main_pages.routes import main_pages_bp
+    from .auth.routes import auth_bp
+    from .pedidos.routes import pedidos_bp
+    from .contratos.routes import contratos_bp
+    from .relatorios.routes import relatorios_bp
 
-    # Registrar Blueprints
-    # As importações agora acontecem aqui para evitar problemas de importação circular
-    from app.auth.routes import auth_bp
-    from app.pedidos.routes import pedidos_bp
-    from app.contratos.routes import contratos_bp
-    from app.relatorios.routes import relatorios_bp
-
-    # Registre o Blueprint de páginas primeiro, pois ele contém a rota principal
     app.register_blueprint(main_pages_bp)
-    app.register_blueprint(auth_bp) # Adicione o prefixo aqui
-    app.register_blueprint(pedidos_bp) # Adicione o prefixo aqui
-    app.register_blueprint(contratos_bp) # Adicione o prefixo aqui
-    app.register_blueprint(relatorios_bp) # Adicione o prefixo aqui
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(pedidos_bp)
+    app.register_blueprint(contratos_bp)
+    app.register_blueprint(relatorios_bp)
+    
+    with app.app_context():
+        db.create_all()
+        print("Banco de dados inicializado e tabelas criadas (se necessário).")
 
-
-    # Rota global para verificar o status, se for mantida
     @app.route('/status', methods=['GET'])
     def status_check():
         return jsonify({'status': 'online', 'message': 'Backend online e pronto!'}), 200
