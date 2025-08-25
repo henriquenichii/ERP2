@@ -1,0 +1,100 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6; /* Cor de fundo suave */
+}
+.screen {
+    display: none; /* Esconde todas as telas por padrão */
+}
+.screen.active {
+    display: block; /* Mostra a tela ativa */
+}
+.btn-primary {
+    @apply bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out;
+}
+.btn-secondary {
+    @apply bg-gray-300 text-gray-800 px-6 py-3 rounded-lg shadow-md hover:bg-gray-400 transition duration-300 ease-in-out;
+}
+.input-field {
+    @apply mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm;
+}
+.table-header th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+.table-row td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+}
+.status-pendente {
+    @apply bg-yellow-100 text-yellow-800 px-2 inline-flex text-xs leading-5 font-semibold rounded-full;
+}
+.status-confirmado {
+    @apply bg-green-100 text-green-800 px-2 inline-flex text-xs leading-5 font-semibold rounded-full;
+}
+.status-producao {
+    @apply bg-blue-100 text-blue-800 px-2 inline-flex text-xs leading-5 font-semibold rounded-full;
+}
+/* Estilo para o modal */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+/* Estilos para campos editáveis (visíveis no modo de edição) */
+.editable-field {
+    border: 1px solid #ccc;
+    padding: 4px;
+    border-radius: 4px;
+}
+.editable-field:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+
+/* ... (seus estilos existentes) ... */
+
+/* Estilos para o Popover de Detalhes do Pedido */
+#pedido-popover {
+    position: absolute; /* Posicionamento absoluto em relação ao ancestral posicionado */
+    top: 0; /* Posição inicial (será ajustada pelo JS) */
+    left: 0; /* Posição inicial (será ajustada pelo JS) */
+    transform: translate(-50%, -100%); /* Ajusta a posição para centralizar acima do mouse */
+    opacity: 0; /* Escondido por padrão */
+    transition: opacity 0.2s ease-in-out; /* Transição suave de opacidade */
+    pointer-events: none; /* Permite que o mouse passe por cima sem interagir com ele */
+}
+
+#pedido-popover.visible {
+    opacity: 1; /* Torna visível */
+}
